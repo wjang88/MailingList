@@ -39,11 +39,21 @@ class listener implements EventSubscriberInterface
 	* @return \davidiq\mailinglist\event\listener
 	* @access public
 	*/
-	public function __construct(\phpbb\config\config $config, $phpbb_root_path, $php_ext)
+	public function __construct(\phpbb\config\config $config, $phpbb_root_path, $php_ext, $db)
 	{
 		$this->config = $config;
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->php_ext = $php_ext;
+		$this->db = $db;
+	}
+
+	// logger -- wjang
+	private function dumpy($anything)
+	{	
+		    global $phpbb_root_path;
+		        $log_file = $phpbb_root_path . 'store/mailinglist.log';
+		        $entry = date('Y-m-d H:i:s ') . print_r($anything, true) . PHP_EOL;
+			    file_put_contents($log_file, $entry, FILE_APPEND | LOCK_EX);
 	}
 
 	/**
@@ -82,7 +92,40 @@ class listener implements EventSubscriberInterface
 				return;
 			}
 
+			/***************************************************************************/
+			// @author : wjang
+			/***************************************************************************/
+
 			$post_data = $event['data'];
+			$this->dumpy($post_data);
+
+			// get post_text and check for hidden message flag
+			$sql = 'SELECT post_text FROM ' . POSTS_TABLE . 
+					" WHERE post_id = '" . 
+					$this->db->sql_escape($post_data['post_id']) . "'";
+			$result = $this->db->sql_query($sql);
+			$member = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+
+			$this->dumpy('post_id:');
+			$this->dumpy($post_data['post_id']);
+			$this->dumpy('lserv flag value:');
+			$this->dumpy($member['post_text']);
+			$this->dumpy($this->config['mailinglist_email']);
+
+			// check if post is flagged 
+			// if flagged then return and do not send email to mailing list
+			$hiddenMsg = "[url=\"lserv_cron_task\"]";
+			if ( stripos("".$member['post_text'], $hiddenMsg) !== FALSE ) {
+				$this->dumpy('Post is from lserv. Aborting send_message().');
+				return;
+			}
+			$this->dumpy('Post is from PHPBB. send_message().');
+
+			/***************************************************************************/
+			// @author : wjang
+			/***************************************************************************/
+
 			$email_data = array(
 				'AUTHOR_NAME'				=> htmlspecialchars_decode($post_data['post_username']),
 				'TOPIC_TITLE'				=> htmlspecialchars_decode($post_data['topic_title']),
@@ -95,10 +138,11 @@ class listener implements EventSubscriberInterface
 				'U_FORUM'					=> generate_board_url() . "/viewforum.{$this->php_ext}?f={$post_data['forum_id']}",
 
 				'U_MAILINGLIST_UNSUBSCRIBE'	=> $this->config['mailinglist_unsubscribe'],
-			);
-			$template_name = 'mailinglist_new_' . ($new_topic ? 'topic' : 'post');
 
-			$this->send_message($email_data, $template_name);
+			);
+			// $template_name = 'mailinglist_new_' . ($new_topic ? 'topic' : 'post');
+
+			$this->send_message($email_data, 'mailinglist_new_post');
 		}
 	}
 
@@ -142,7 +186,7 @@ class listener implements EventSubscriberInterface
 		}
 
 		$messenger = new \messenger(false);
-		$messenger->template('@davidiq_mailinglist/' . $template);
+		$messenger->template('@davidiq_mailinglist/' . $template, 'en');
 		$messenger->to($this->config['mailinglist_email']);
 		$messenger->assign_vars($message_data);
 		$messenger->send();

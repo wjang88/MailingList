@@ -1,22 +1,9 @@
-Subject: Topic reply notification - "{TOPIC_TITLE}"
+Subject: {TOPIC_TITLE}
 
-You are receiving this notification because you are on the {SITENAME} mailing list. The topic "{TOPIC_TITLE}" has received a reply by {AUTHOR_NAME} in the "{FORUM_NAME}" forum.
+This email was sent to the ListServ on behalf of '{AUTHOR_NAME}' from a post on the '{FORUM_NAME}' Forum at '{SITENAME}'.
+
+....... Message from '{AUTHOR_NAME}' .......
+
 <!-- IF POST_CONTENTS != '' -->
-
-######### BEGIN POST CONTENTS #########
 {POST_CONTENTS}
-#########  END POST CONTENTS  #########
 <!-- ENDIF -->
-
-If you want to view or reply to the post, click the following link:
-{U_POST}
-
-If you want to view the forum, click the following link:
-{U_FORUM}
-<!-- IF U_MAILINGLIST_UNSUBSCRIBE != '' -->
-
-If you wish to unsubscribe from this mailing list click the following link:
-{U_MAILINGLIST_UNSUBSCRIBE}
-<!-- ENDIF -->
-
-{EMAIL_SIG}

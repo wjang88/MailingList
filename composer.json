@@ -1,16 +1,22 @@
 {
 	"name": "davidiq/mailinglist",
 	"type": "phpbb-extension",
-	"description": "Adds basic mailing list functionality to forward new posts/replies to a mailing list.",
+	"description": "Adds basic mailing list functionality to forward new posts/replies to a mailing list and integrates with lserv extension.",
 	"homepage": "https://www.phpbb.com/customise/db/extension/mailinglist/",
-	"version": "1.0.0",
-	"keywords": ["phpbb", "extension", "email", "mailinglist"],
+	"version": "2.0.0",
+	"keywords": ["phpbb", "extension", "email", "mailinglist", "lserv"],
 	"license": "GPL-2.0",
 	"authors": [
 		{
 			"name": "David Colón",
 			"email": "phpbb@davidiq.com",
 			"homepage": "http://www.davidiq.com",
+			"role": "Developer"
+		},
+		{
+			"name": "Woohyuk Jang",
+			"email": "johnjang@gmail.com",
+			"homepage": "https://www.github.com/wjang88",
 			"role": "Developer"
 		}
 	],
@@ -24,12 +30,7 @@
 	"extra": {
 		"display-name": "Mailing List",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.1.4,<3.2.0@dev"
-		},
-		"version-check": {
-			"host": "www.phpbb.com",
-			"directory": "/customise/db/extension/mailinglist",
-			"filename": "version_check"
+			"phpbb/phpbb": ">=3.1.4"
 		}
 	}
 }
